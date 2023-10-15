@@ -19,7 +19,6 @@ class UserSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         email = validated_data.pop('email', None)  
         password = validated_data.pop('password', None)
-        print(email+ " : "+ password)
         instance = self.Meta.model(**validated_data)
 
         if email is not None and password is not None:
