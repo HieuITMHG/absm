@@ -60,5 +60,8 @@ class User(APIView):
         return Response(serialized_user.data)
     
 class Post(viewsets.ModelViewSet):
-    queryset = Post.objects.all()
     serializer_class = PostSerializer
+    queryset = Post.objects.all().order_by('-created_at')
+
+    def perform_create(self, serializer):
+        serializer.save(creater=self.request.user)

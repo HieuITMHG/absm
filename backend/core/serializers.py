@@ -29,9 +29,12 @@ class UserSerializer(serializers.ModelSerializer):
         return instance
         
 class PostSerializer(serializers.ModelSerializer):
+    creater = UserSerializer(read_only=True)  # Use UserSerializer to serialize the creater field
+
     class Meta:
         model = Post
         fields = ['id', 'creater', 'caption', 'created_at']
+        read_only_fields = ['creater']
 
 
         
