@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from core.models import User, Post
+from core.models import User, Post, Media
 
 class UserSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(write_only=True)
@@ -27,14 +27,34 @@ class UserSerializer(serializers.ModelSerializer):
 
         instance.save()
         return instance
+    
+
+class MediaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Media
+        fields = ['file', 'post']
+
         
 class PostSerializer(serializers.ModelSerializer):
-    creater = UserSerializer(read_only=True)  # Use UserSerializer to serialize the creater field
+    creater = UserSerializer(read_only=True)
+    media = MediaSerializer(many=True, read_only=True)
 
     class Meta:
         model = Post
-        fields = ['id', 'creater', 'caption', 'created_at']
+        fields = ['id', 'creater', 'caption', 'created_at', 'media']
         read_only_fields = ['creater']
+
+    def create(self, validated_data):
+
+        media_data = validated_data.pop('media', None)
+        post = Post.objects.create(**validated_data)
+
+        if media_data:
+            for media_item_data in media_data:
+                Media.objects.create(post=post, **media_item_data)
+
+        return post
+
 
 
         

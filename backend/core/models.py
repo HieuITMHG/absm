@@ -15,3 +15,7 @@ class Post(models.Model):
 
     def __str__(self):
         return self.caption
+    
+class Media(models.Model):
+    post = models.ForeignKey('Post', related_name='media', on_delete=models.CASCADE)
+    file = models.FileField(upload_to='media/')
