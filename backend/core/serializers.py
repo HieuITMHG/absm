@@ -32,29 +32,16 @@ class UserSerializer(serializers.ModelSerializer):
 class MediaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Media
-        fields = ['file', 'post']
+        fields = ['id', 'file']
 
-        
+
 class PostSerializer(serializers.ModelSerializer):
+    media = MediaSerializer(many=True)
     creater = UserSerializer(read_only=True)
-    media = MediaSerializer(many=True, read_only=True)
 
     class Meta:
         model = Post
         fields = ['id', 'creater', 'caption', 'created_at', 'media']
         read_only_fields = ['creater']
-
-    def create(self, validated_data):
-
-        media_data = validated_data.pop('media', None)
-        post = Post.objects.create(**validated_data)
-
-        if media_data:
-            for media_item_data in media_data:
-                Media.objects.create(post=post, **media_item_data)
-
-        return post
-
-
 
         

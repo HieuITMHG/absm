@@ -3,10 +3,11 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
-from .serializers import UserSerializer, PostSerializer
+from .serializers import UserSerializer, PostSerializer, MediaSerializer
 from rest_framework.permissions import IsAuthenticated
-from rest_framework import viewsets
-from core.models import User, Post
+from rest_framework import viewsets, status,permissions
+from core.models import User, Post, Media
+from rest_framework.parsers import MultiPartParser, FormParser
 
 class RegisterView(APIView):
     permission_classes = (AllowAny,)
@@ -51,17 +52,52 @@ class LogoutView(APIView):
         except Exception as e:
             return Response({'error': 'Invalid refresh token'}, status=400)
         
-class User(APIView):
-    permission_classes = [IsAuthenticated]
-
+class UserView(APIView):
+    serializer_class = UserSerializer
     def get(self, request):
         user = request.user
         serialized_user = UserSerializer(user) 
         return Response(serialized_user.data)
     
-class Post(viewsets.ModelViewSet):
-    serializer_class = PostSerializer
-    queryset = Post.objects.all().order_by('-created_at')
+# class PostView(APIView):
+#     def get(self, request):
+#         posts = Post.objects.all()
+#         serialized_posts = PostSerializer(posts, many=True)  
+#         return Response(serialized_posts.data, status=status.HTTP_200_OK)
+    
+#     def post(self, request):
+#         serializer = PostSerializer(data=request.data)
+        
+#         if serializer.is_valid():
+#             caption = serializer.validated_data['caption']
+#             creator = self.request.user
+#             post = Post.objects.create(caption=caption, creator=creator)
+#             serialized_media = serializer.validated_data['media']
+#             print(serialized_media+"haha")
+#             for media_data in serialized_media:
+#                 Media.objects.create(post=post, file=media_data['file'])
+            
+#             return Response({'message': 'Bài đăng đã được tạo thành công.'}, status=status.HTTP_201_CREATED)
+        
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def perform_create(self, serializer):
-        serializer.save(creater=self.request.user)
+
+class PostView(APIView):
+    parser_classes = [MultiPartParser, FormParser]
+    def get(self, request):
+        posts = Post.objects.all().order_by('-created_at')
+        serialized_posts = PostSerializer(posts, many=True)  
+        return Response(serialized_posts.data, status=status.HTTP_200_OK)
+    def post(self, request):
+        caption = request.data.get('caption')
+        media_files = request.FILES.getlist('media')
+        # Tạo bài đăng
+        post = Post.objects.create(creater=request.user, caption=caption)
+
+        # Lưu các media và liên kết chúng với bài đăng
+        for media_file in media_files:
+            media = Media.objects.create(post=post, file=media_file)
+
+        # Serialize bài đăng để trả về
+        serializer = PostSerializer(post)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
