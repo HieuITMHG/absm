@@ -11,5 +11,7 @@ urlpatterns = [
     path('login/', views.LoginView.as_view(), name='token_obtain_pair'),
     path('logout/', views.LogoutView.as_view(), name='token_logout'),
     path('user/', views.UserView.as_view(), name="user"),
-    path('posts/', views.PostView.as_view(), name='posts')
+    path('posts/', views.PostView.as_view(), name='posts'),
+    path('follow/', views.Follow.as_view(), name='follow'),
+    path('unfollow/', views.Unfollow.as_view(), name='unfollow')
 ]+router.urls

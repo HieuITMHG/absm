@@ -5,7 +5,7 @@ class UserSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(write_only=True)
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'password']
+        fields = ['id', 'username', 'email', 'password', 'followed_by']
 
         extra_kwargs = {
             'password' : {'write_only' : True},
@@ -43,5 +43,8 @@ class PostSerializer(serializers.ModelSerializer):
         model = Post
         fields = ['id', 'creater', 'caption', 'created_at', 'media']
         read_only_fields = ['creater']
+
+class FollowSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
 
         

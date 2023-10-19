@@ -3,11 +3,11 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
-from .serializers import UserSerializer, PostSerializer, MediaSerializer
+from .serializers import UserSerializer, PostSerializer, MediaSerializer, FollowSerializer
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import viewsets, status,permissions
 from core.models import User, Post, Media
-from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 
 class RegisterView(APIView):
     permission_classes = (AllowAny,)
@@ -75,21 +75,42 @@ class PostView(APIView):
         # Tạo bài đăng
         post = Post.objects.create(creater=request.user, caption=caption)
 
-        # Lưu các media và liên kết chúng với bài đăng
         for media_file in media_files:
             media = Media.objects.create(post=post, file=media_file)
 
-        # Serialize bài đăng để trả về
         serializer = PostSerializer(post)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     
-class follow(APIView):
+class Follow(APIView):
     permission_classes = [IsAuthenticated]
     def post(self, request):
-        follwer = request.user
-        is_followed_user_id = request.data.get['id']
-        is_followed_user = User.objects.get(pk = is_followed_user_id)
-        action = request.data.get("action")
-        if action == "Follow":
+        serializer = FollowSerializer(data=request.data)
+        if serializer.is_valid():
+            id = serializer.validated_data['id']
+            followed_user = User.objects.get(pk = id)
+            follower = request.user
+            if followed_user != follower:
+                follower.follow.add(followed_user)
+                follower.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class Unfollow(APIView):
+    permission_classes = [IsAuthenticated]
+    def post(self, request):
+        serializer = FollowSerializer(data=request.data)
+        if  serializer.is_valid():
+            id = serializer.validated_data['id']
+            followed_user = User.objects.get(pk = id)
+            follower = request.user
+            if followed_user != follower:
+                follower.follow.remove(followed_user)
+                follower.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
             
 
