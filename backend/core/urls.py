@@ -4,6 +4,7 @@ from rest_framework import routers
 
 router = routers.DefaultRouter()
 
+router.register(r'users', views.PeopleView, basename='users')
 
 urlpatterns = [
     path('register/', views.RegisterView.as_view(), name='token_register'),

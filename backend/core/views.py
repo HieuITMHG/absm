@@ -59,28 +59,9 @@ class UserView(APIView):
         serialized_user = UserSerializer(user) 
         return Response(serialized_user.data)
     
-# class PostView(APIView):
-#     def get(self, request):
-#         posts = Post.objects.all()
-#         serialized_posts = PostSerializer(posts, many=True)  
-#         return Response(serialized_posts.data, status=status.HTTP_200_OK)
-    
-#     def post(self, request):
-#         serializer = PostSerializer(data=request.data)
-        
-#         if serializer.is_valid():
-#             caption = serializer.validated_data['caption']
-#             creator = self.request.user
-#             post = Post.objects.create(caption=caption, creator=creator)
-#             serialized_media = serializer.validated_data['media']
-#             print(serialized_media+"haha")
-#             for media_data in serialized_media:
-#                 Media.objects.create(post=post, file=media_data['file'])
-            
-#             return Response({'message': 'Bài đăng đã được tạo thành công.'}, status=status.HTTP_201_CREATED)
-        
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+class PeopleView(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
 
 class PostView(APIView):
     parser_classes = [MultiPartParser, FormParser]
@@ -101,3 +82,14 @@ class PostView(APIView):
         # Serialize bài đăng để trả về
         serializer = PostSerializer(post)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
+class follow(APIView):
+    permission_classes = [IsAuthenticated]
+    def post(self, request):
+        follwer = request.user
+        is_followed_user_id = request.data.get['id']
+        is_followed_user = User.objects.get(pk = is_followed_user_id)
+        action = request.data.get("action")
+        if action == "Follow":
+            
+
