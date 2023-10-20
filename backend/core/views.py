@@ -54,9 +54,11 @@ class LogoutView(APIView):
         
 class UserView(APIView):
     serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated]
+
     def get(self, request):
         user = request.user
-        serialized_user = UserSerializer(user) 
+        serialized_user = self.serializer_class(user)
         return Response(serialized_user.data)
     
 class PeopleView(viewsets.ModelViewSet):
