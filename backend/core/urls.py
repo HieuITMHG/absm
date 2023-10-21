@@ -13,5 +13,7 @@ urlpatterns = [
     path('user/', views.UserView.as_view(), name="user"),
     path('posts/', views.PostView.as_view(), name='posts'),
     path('follow/', views.Follow.as_view(), name='follow'),
-    path('unfollow/', views.Unfollow.as_view(), name='unfollow')
+    path('unfollow/', views.Unfollow.as_view(), name='unfollow'),
+    path('post/<int:userid>/', views.PersonnalPostView.as_view(), name='post'),
+    path('following/', views.FollowingPosts.as_view(), name="following")
 ]+router.urls

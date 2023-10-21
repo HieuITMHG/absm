@@ -62,8 +62,9 @@ class UserView(APIView):
         return Response(serialized_user.data)
     
 class PeopleView(viewsets.ModelViewSet):
-    queryset = User.objects.all()
     serializer_class = UserSerializer
+    queryset = User.objects.all()
+
 
 class PostView(APIView):
     parser_classes = [MultiPartParser, FormParser]
@@ -112,7 +113,27 @@ class Unfollow(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+class PersonnalPostView(APIView):
+    def get(self, request, userid):
+        creater = User.objects.get(pk = userid)
+        posts = Post.objects.filter(creater = creater)
+        serializer = PostSerializer(posts, many = True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+class FollowingPosts(APIView):
+    permission_classes = [IsAuthenticated]
 
+    def get(self, request):
+        current_user = request.user
+        followings = current_user.follow.all()
+        posts = []
+
+        for following in followings:
+            posts.extend(following.posts.all())
+
+        serializer = PostSerializer(posts, many=True)
+        print(serializer.data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
             
 
