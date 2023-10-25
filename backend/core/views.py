@@ -8,6 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import viewsets, status,permissions
 from core.models import User, Post, Media
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
+import os
 
 class RegisterView(APIView):
     permission_classes = (AllowAny,)
@@ -132,8 +133,12 @@ class FollowingPosts(APIView):
             posts.extend(following.posts.all())
 
         serializer = PostSerializer(posts, many=True)
-        print(serializer.data)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+class UpdateAvatar(APIView):
+    def post(self, request):
+        haha = request.data.get("data")
+        print(haha)
 
             
 

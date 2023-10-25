@@ -1,11 +1,19 @@
 from rest_framework import serializers
 from core.models import User, Post, Media
 
+
+class MediaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Media
+        fields = ['id', 'file']
+
 class UserSerializer(serializers.ModelSerializer):
+    avatar = MediaSerializer()
     email = serializers.EmailField(write_only=True)
+    followed_by = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'password', 'followed_by']
+        fields = ['id', 'username', 'email', 'password', 'follow', 'followed_by', 'avatar']
 
         extra_kwargs = {
             'password' : {'write_only' : True},
@@ -29,10 +37,7 @@ class UserSerializer(serializers.ModelSerializer):
         return instance
     
 
-class MediaSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Media
-        fields = ['id', 'file']
+
 
 
 class PostSerializer(serializers.ModelSerializer):
