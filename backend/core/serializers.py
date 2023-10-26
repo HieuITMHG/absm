@@ -8,7 +8,7 @@ class MediaSerializer(serializers.ModelSerializer):
         fields = ['id', 'file']
 
 class UserSerializer(serializers.ModelSerializer):
-    avatar = MediaSerializer()
+    avatar = MediaSerializer(read_only=True)
     email = serializers.EmailField(write_only=True)
     followed_by = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     class Meta:

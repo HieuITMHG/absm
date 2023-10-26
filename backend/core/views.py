@@ -9,6 +9,15 @@ from rest_framework import viewsets, status,permissions
 from core.models import User, Post, Media
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 import os
+from django.conf import settings
+import base64
+from django.core.files.base import ContentFile
+import random
+import string
+
+
+def generate_random_string(length):
+    return ''.join(random.choice(string.ascii_letters) for _ in range(length))
 
 class RegisterView(APIView):
     permission_classes = (AllowAny,)
@@ -136,9 +145,33 @@ class FollowingPosts(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
     
 class UpdateAvatar(APIView):
-    def post(self, request):
-        haha = request.data.get("data")
-        print(haha)
+    permission_classes = [IsAuthenticated]
 
+    def post(self, request):
+        try:
+            code = request.data.get('code')
+            if code is not None:
+                format, imgstr = code.split(';base64,')
+                ext = format.split('/')[-1]
+                data = base64.b64decode(imgstr)
+                ingre = generate_random_string(20)
+                # Save the file in the media folder
+                file_name = os.path.join(settings.MEDIA_ROOT, f'{ingre}.{ext}')
+                with open(file_name, 'wb') as f:
+                    f.write(data)
+
+                # Create a new Media instance and save it
+                media_instance = Media(file=f'{ingre}.{ext}')
+                media_instance.save()
+
+                # Assuming you have a ForeignKey 'avatar' in your User model
+                request.user.avatar = media_instance
+                request.user.save()
+
+                return Response({"message": "Code received successfully"}, status=status.HTTP_200_OK)
+            else:
+                return Response({"error": "Missing 'code' in request data"}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             
 
