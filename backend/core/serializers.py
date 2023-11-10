@@ -46,7 +46,7 @@ class PostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Post
-        fields = ['id', 'creater', 'caption', 'created_at', 'media']
+        fields = ['id', 'creater', 'caption', 'created_at', 'media', 'liker']
         read_only_fields = ['creater']
 
 class FollowSerializer(serializers.Serializer):

@@ -173,5 +173,37 @@ class UpdateAvatar(APIView):
                 return Response({"error": "Missing 'code' in request data"}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class Like(APIView):
+    permission_classes = [IsAuthenticated]
+    def post(self, request):
+        post_id = request.data.get("post_id")
+        print(f"haha {post_id}")
+        liked_post = Post.objects.get(pk = post_id)
+        liker = request.user
+
+        liked_post.liker.add(liker)
+        liked_post.save()
+        serializer = PostSerializer(liked_post)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+class Unlike(APIView):
+    permission_classes = [IsAuthenticated]
+    def post(self, request):
+        post_id = request.data.get("post_id")
+        print(f"huhu {post_id}")
+        liked_post = Post.objects.get(pk = post_id)
+        liker = request.user
+
+        liked_post.liker.remove(liker)
+        liked_post.save()
+        serializer = PostSerializer(liked_post)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+
+        
+            
+
             
 

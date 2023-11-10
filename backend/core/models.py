@@ -9,6 +9,7 @@ class User(AbstractUser):
         return self.username
     
 class Post(models.Model):
+    liker = models.ManyToManyField('User', blank=True, related_name="liked_posts")
     creater = models.ForeignKey('User', on_delete=models.CASCADE, related_name="posts")
     caption = models.TextField()
     created_at = models.DateTimeField(default=timezone.now)
