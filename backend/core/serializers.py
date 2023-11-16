@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from core.models import User, Post, Media
+from core.models import User, Post, Media, Comment
 
 
 class MediaSerializer(serializers.ModelSerializer):
@@ -51,5 +51,13 @@ class PostSerializer(serializers.ModelSerializer):
 
 class FollowSerializer(serializers.Serializer):
     id = serializers.IntegerField()
+
+class CommentSerializer(serializers.ModelSerializer):
+    owner = UserSerializer()
+    destination = PostSerializer()
+
+    class Meta:
+        model = Comment
+        fields = ['id', 'owner', 'content', 'destination']
 
         

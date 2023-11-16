@@ -23,3 +23,11 @@ class Media(models.Model):
 
     def __str__(self):
         return f"{self.id} : {self.file.url}"
+    
+class Comment(models.Model):
+    owner = models.ForeignKey('User', related_name="comment", on_delete=models.CASCADE)
+    content = models.CharField(max_length=100)
+    destination = models.ForeignKey('Post', related_name="post_comment", on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.content
