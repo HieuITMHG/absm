@@ -94,6 +94,10 @@ class PostView(APIView):
         serializer = PostSerializer(post)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     
+class SinglePost(viewsets.ModelViewSet):
+    serializer_class = PostSerializer
+    queryset = Post.objects.all()
+    
 class Follow(APIView):
     permission_classes = [IsAuthenticated]
     def post(self, request):
@@ -200,30 +204,22 @@ class Unlike(APIView):
         serializer = PostSerializer(liked_post)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
-class Comment(APIView):
-    serializer_class = CommentSerializer
+class CommentView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request, format=None):
+        post_id = request.data.get("post_id")
+        destination = Post.objects.get(pk=post_id)
+        content = request.data.get("content")
+        owner = request.user
 
-    def post(self, request, *args, **kwargs):
-        post_id = request.data.get('post_id')
-        content = request.data.get('content')
+        # Create an instance using the model's manager
+        comment = Comment.objects.create(owner=owner, destination=destination, content=content)
 
-        try:
-            post = Post.objects.get(pk=post_id)
-        except Post.DoesNotExist:
-            return Response({"message": "Post does not exist."}, status=status.HTTP_404_NOT_FOUND)
+        serializer = CommentSerializer(comment)
 
-        serializer = self.serializer_class(data={
-            'owner': request.user,
-            'destination': post,
-            'content': content
-        })
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-        
             
 
             

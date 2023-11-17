@@ -7,6 +7,9 @@ class MediaSerializer(serializers.ModelSerializer):
         model = Media
         fields = ['id', 'file']
 
+
+
+
 class UserSerializer(serializers.ModelSerializer):
     avatar = MediaSerializer(read_only=True)
     email = serializers.EmailField(write_only=True)
@@ -37,27 +40,34 @@ class UserSerializer(serializers.ModelSerializer):
         return instance
     
 
-
-
-
-class PostSerializer(serializers.ModelSerializer):
-    media = MediaSerializer(many=True)
-    creater = UserSerializer(read_only=True)
-
-    class Meta:
-        model = Post
-        fields = ['id', 'creater', 'caption', 'created_at', 'media', 'liker']
-        read_only_fields = ['creater']
-
-class FollowSerializer(serializers.Serializer):
-    id = serializers.IntegerField()
-
 class CommentSerializer(serializers.ModelSerializer):
-    owner = UserSerializer()
-    destination = PostSerializer()
+    owner = UserSerializer(read_only=True)
+    destination = serializers.PrimaryKeyRelatedField(queryset=Post.objects.all())
 
     class Meta:
         model = Comment
         fields = ['id', 'owner', 'content', 'destination']
 
+
+class PostSerializer(serializers.ModelSerializer):
+    media = MediaSerializer(many=True)
+    creater = UserSerializer(read_only=True)
+    comment = CommentSerializer(many=True, source='post_comment', read_only=True)
+
+    class Meta:
+        model = Post
+        fields = ['id', 'creater', 'caption', 'created_at', 'media', 'liker', 'comment']
+        read_only_fields = ['creater']
+
+class FollowSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+
+
+# class CommentSerializer(serializers.ModelSerializer):
+#     owner = UserSerializer(read_only=True)
+#     destination = PostSerializer(read_only=True)
+
+#     class Meta:
+#         model = Comment
+#         fields = ['id', 'owner', 'content', 'destination']
         
