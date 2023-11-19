@@ -5,7 +5,7 @@ from core.models import User, Post, Media, Comment
 class MediaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Media
-        fields = ['id', 'file']
+        fields = ['id', 'file', 'post']
 
 
 

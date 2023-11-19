@@ -89,7 +89,9 @@ class PostView(APIView):
         post = Post.objects.create(creater=request.user, caption=caption)
 
         for media_file in media_files:
+            print(media_file)
             media = Media.objects.create(post=post, file=media_file)
+            media.save()
 
         serializer = PostSerializer(post)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
