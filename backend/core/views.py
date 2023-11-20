@@ -222,7 +222,18 @@ class CommentView(APIView):
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-            
+class BioView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        bio = request.data.get("bio")
+
+        if bio is not None:
+            request.user.aboutme = bio
+            request.user.save()
+            return Response({"updated"}, status= status.HTTP_200_OK)
+        else:
+            return Response({"error": "Bio data is missing"}, status=status.HTTP_400_BAD_REQUEST)
 
             
 

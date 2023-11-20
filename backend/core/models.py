@@ -4,7 +4,7 @@ from django.utils import timezone
 
 class User(AbstractUser):
     follow = models.ManyToManyField('self', blank=True, symmetrical=False, related_name='followed_by')
-    avatar = models.ForeignKey('Media', blank=True, null=True, on_delete=models.CASCADE, related_name='post_avatar')
+    avatar = models.ForeignKey('Media', blank=True, null=True, on_delete=models.CASCADE, related_name='post_avatar', default=80)
     aboutme = models.CharField(max_length=100, default="About me", blank=True)
     def __str__(self):
         return self.username

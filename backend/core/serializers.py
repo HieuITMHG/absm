@@ -16,7 +16,7 @@ class UserSerializer(serializers.ModelSerializer):
     followed_by = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'password', 'follow', 'followed_by', 'avatar']
+        fields = ['id', 'username', 'email', 'password', 'follow', 'followed_by', 'avatar', 'aboutme']
 
         extra_kwargs = {
             'password' : {'write_only' : True},
@@ -63,11 +63,3 @@ class FollowSerializer(serializers.Serializer):
     id = serializers.IntegerField()
 
 
-# class CommentSerializer(serializers.ModelSerializer):
-#     owner = UserSerializer(read_only=True)
-#     destination = PostSerializer(read_only=True)
-
-#     class Meta:
-#         model = Comment
-#         fields = ['id', 'owner', 'content', 'destination']
-        

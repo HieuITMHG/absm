@@ -20,5 +20,6 @@ urlpatterns = [
     path('updateavatar/', views.UpdateAvatar.as_view(), name="updateavatar"),
     path('like/', views.Like.as_view(), name="like"),
     path('unlike/', views.Unlike.as_view(), name="unlike"),
-    path('comment/', views.CommentView.as_view(), name="comment")
+    path('comment/', views.CommentView.as_view(), name="comment"),
+    path('bio/', views.BioView.as_view(), name="bio")
 ]+router.urls
